@@ -66,7 +66,7 @@ func (r *Router) AddMiddleware(middleware Handler) {
 
 func (r *Router) middlewareWrapper(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		var wg *sync.WaitGroup
+		var wg sync.WaitGroup
 		wg.Add(len(r.middlewares))
 		for _, f := range r.middlewares {
 			go f(w, req)
