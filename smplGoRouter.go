@@ -1,6 +1,7 @@
 package smplGoRouter
 
 import (
+	"log"
 	"net/http"
 	"sync"
 )
@@ -89,6 +90,7 @@ func (r *Router) handle(path string, handler Handler, method string) {
 		}
 	}
 
+	log.Printf("smplGoRouter: \t %s \t %s\n", method, path)
 	r.Mux.Handle(path, r.middlewareWrapper(http.HandlerFunc(handle)))
 }
 
