@@ -2,6 +2,7 @@ package smplGoRouter
 
 import (
 	"net/http"
+	"sync"
 )
 
 type Handler func(http.ResponseWriter, *http.Request)
@@ -65,9 +66,16 @@ func (r *Router) AddMiddleware(middleware Handler) {
 
 func (r *Router) middlewareWrapper(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		var wg sync.WaitGroup
+
 		for _, f := range r.middlewares {
-			f(w, req)
+			wg.Add(1)
+			go func(f Handler) {
+				defer wg.Done()
+				f(w, req)
+			}(f)
 		}
+		wg.Wait()
 		next.ServeHTTP(w, req)
 	})
 }
